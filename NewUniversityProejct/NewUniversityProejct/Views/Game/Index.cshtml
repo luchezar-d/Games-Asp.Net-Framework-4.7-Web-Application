@@ -1,0 +1,95 @@
+﻿@using PagedList;
+@using PagedList.Mvc;
+@model IEnumerable<UniversityProject.Models.Game>
+
+<link href="~/Content/simple-sidebar.css" rel="stylesheet" />
+<link rel="stylesheet" href="~/css/site.css" />
+
+@{
+    ViewBag.Title = "Games Catalog";
+}
+@if (User.IsInRole("Admin"))
+{
+    <h2>Game Catalog For 2019</h2>
+
+    <p class="btn btn-info" id="mybtn">
+        @Html.ActionLink("Create New", "Create", null, new { @class = "mybtn" })
+    </p>
+}
+@if (User.Identity.IsAuthenticated)
+{
+    <hr />
+    using (Html.BeginForm())
+    {
+        <div class="col-md-12">
+            <div class="col-md-2">
+                @Html.TextBox("nameSearch", (string)ViewBag.NameSearch, new { @class = "form-control" })
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-info">
+                    <i class="glyphicon glyphicon-search"></i>Search
+                </button>
+            </div>
+        </div>
+        <div class="col-md-2" style="height: 50px;"></div>
+    }
+}
+<br />
+<div class="divImage"></div>
+<br />
+<br />
+<table class="table">
+    <tr>
+        <th>
+            @Html.ActionLink("Name", "Index", new { sortOrder = ViewBag.NameSortParm, nameSearch = ViewBag.NameSearch })
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.ReleaseYear)
+        </th>
+        <th>
+            @Html.ActionLink("Genre", "Index", new { sortOrder = ViewBag.GenreSortParm, nameSearch = ViewBag.NameSearch })
+        </th>
+        <th>
+            @Html.ActionLink("Rating", "Index", new { sortOrder = ViewBag.RatingSortParm, nameSearch = ViewBag.NameSearch })
+        </th>
+
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ReleaseYear)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Genre.GenreName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Rating.RatingValue)
+            </td>
+
+
+            @if (User.IsInRole("Admin"))
+            {
+                <td>
+                    @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
+                    @Html.ActionLink("Details", "Details", new { id = item.Id })|
+                    @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+                </td>
+            }
+            else
+            {
+                <td>
+                    @Html.ActionLink("Details", "Details", new { id = item.Id })
+                </td>
+            }
+        </tr>
+    }
+    
+</table>
+
+@Html.PagedListPager((IPagedList)Model, page => Url.Action("Index", new { page, nameSearch = ViewBag.NameSearch, sortOrder = ViewBag.CurrentSortParm }))
